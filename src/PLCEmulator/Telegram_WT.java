@@ -32,6 +32,7 @@ public class Telegram_WT extends Telegram {
 		_source = getFromTele(in, 88, 106);
 		_dest = getFromTele(in, 106, 124);
 		_mfs_error = getFromTele(in, 124, 128);
+		System.out.println("HU: "+_huid+"HU-Typ: "+_hutype+"Quelle: "+_source+"Ziel: "+_dest+"Fehler: "+_mfs_error);
 	}
 	
 	public String toString(){
@@ -46,6 +47,22 @@ public class Telegram_WT extends Telegram {
 		
 		out = out+huid+hutype+source+dest+mfs_error;
 		return out;
+	}
+	
+	public String getsource() {
+		return _source;
+	}
+
+	public void setsource(String _source) {
+		this._source = _source;
+	}
+
+	public String getdest() {
+		return _dest;
+	}
+
+	public void setdest(String _dest) {
+		this._dest = _dest;
 	}
 	
 	public String gethuid() {

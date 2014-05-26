@@ -21,7 +21,20 @@ public class TelegrammBuilder {
 	
 	//constructor for builder pattern
 	public TelegrammBuilder(){
-		//Do nothing
+		 send = "";
+		 empf = "";
+		 cp = "";
+		 hndshk = "";
+		 error = "";
+		 type = "";
+		 huid = "";
+		 hutype = "";
+		 source = "";
+		 dest = "";
+		 mfs_error = "";
+		 cs = "";
+		 csgr = "";
+		 rsrc = "";
 	}
 	
 	public Telegram buildTelegram(){

@@ -16,7 +16,7 @@ public class TelegrammHandler {
 	private String Tele_Sysr;
 	private String Tele_Stat;
 	private String Tele_Wt = "WT";
-	//private String Tele_Wtco = "WTCO";
+	private String Tele_Wtco = "WTCO";
 	private String Tele_hndshk_Req;
 	private String Tele_hndshk_Conf;
 	private String Tele_length;
@@ -32,21 +32,23 @@ public class TelegrammHandler {
 	public void handle(String inStr){
 		setCount_in(getCount_in() + 1);
 		Telegram in = new Telegram(inStr);
+		/*
 		String 	send = null, 
 				empf = null, 
 				cp = null, 
 				hndshk = null,  
 				//error = null, 
 				type = null;
-		//int numb;
-	
-		send = in.getSend();
-		empf = in.getEmpf();
-		cp = in.getCp();
-		hndshk = in.getHndshk();
-		//numb = in.getNumb();
-		//error = in.getError();
-		type = in.getType();
+		int numb;	
+		*/
+		
+		String send = in.getSend();
+		String empf = in.getEmpf();
+		String cp = in.getCp();
+		String hndshk = in.getHndshk();
+		//int numb = in.getNumb();
+		//String error = in.getError();
+		String type = in.getType();
 		//System.out.println("send: "+send+" empf: "+empf+" hndshk: "+hndshk+" numb: "+numb+" type: "+type);
 		
 		//Confirm Sync request, send start of sync
@@ -86,31 +88,55 @@ public class TelegrammHandler {
 								.hndshk(Tele_hndshk_Req)
 								.numb(count_out++)
 								.type(Tele_Stat)
-								.mfs_error("1234")
+								.mfs_error("0000")
 										.buildTelegram()
 											.toString();
 			send(stat);
 		}
 		//Confirm warehouse task telegram
-		else if(type.equals(Tele_Wt)){
-			confirmTelegram(in);
+		else if(type.equals(Tele_Wt)&&hndshk.equals(Tele_hndshk_Req)){
+			//confirmTelegram(in);
+			
+			//Confirm WT request telegram
+			Telegram_WT _in = new Telegram_WT(inStr);
+			Telegram_WT conf = _in;
+			conf.setEmpf(send);
+			conf.setSend(empf);
+			conf.setHndshk(Tele_hndshk_Conf);
+			send(conf);
+			
+			//Confirm WT
+			Telegram_WT wt_conf = _in;
+			wt_conf.setEmpf(send);
+			wt_conf.setSend(empf);
+			wt_conf.setHndshk(Tele_hndshk_Req);
+			wt_conf.setNumb(count_out++);
+			wt_conf.setType(Tele_Wtco);
+			send(wt_conf);
 		}
 	}
 	
+	//Send telegram as String
 	private void send(String tele){
 		server.sendMessage(tele);
+	}
+	
+	//Send telegram as object
+	private void send(Telegram tele){
+		String out = tele.toString();
+		server.sendMessage(out);
 	}
 	
 	private void confirmTelegram(Telegram in){
 		Telegram out = in;
 		
-		//change sender and receiver
+		//switch sender and receiver
 		String send = in.getSend();
 		String empf = in.getEmpf();
 		out.setEmpf(send);
 		out.setSend(empf);
 		
-		//change handshake
+		//switch handshake
 		String hndshk = in.getHndshk();
 		if(hndshk.equals(Tele_hndshk_Req)){
 			out.setHndshk(Tele_hndshk_Conf);
@@ -119,7 +145,7 @@ public class TelegrammHandler {
 			out.setHndshk(Tele_hndshk_Req);
 		}
 		
-		//make telegram to String and return String
+		//convert telegram to String and return String
 		String tele = out.toString();
 		send(tele);
 	}

@@ -52,6 +52,22 @@ public class Telegram_STAT extends Telegram {
 		return out;
 	}
 	
+	public String getsource() {
+		return _source;
+	}
+
+	public void setsource(String _source) {
+		this._source = _source;
+	}
+
+	public String getdest() {
+		return _dest;
+	}
+
+	public void setdest(String _dest) {
+		this._dest = _dest;
+	}
+	
 	public String getmfs_error() {
 		return _mfs_error;
 	}

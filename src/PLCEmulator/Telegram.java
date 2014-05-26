@@ -12,8 +12,6 @@ public class Telegram {
 	private int _numb;
 	private String _error;
 	private String _type;
-	private String _source;
-	private String _dest;
 	
 	public Telegram(String _send, String _empf, String _cp, String _hndshk, int _numb,
 			String _error, String _type)
@@ -38,6 +36,7 @@ public class Telegram {
 		_type = getFromTele(in, 60, 64);
 	}
 	
+	//Converts telegram to String, spaces are filled up with filler.
 	public String toString(){
 		String send,empf,cp,hndshk,numb,error,type, end;
 		
@@ -54,6 +53,7 @@ public class Telegram {
 		return out;
 	}
 	
+	//Converts telegram to String, end is not filled up with filler.
 	public String toStringShort(){
 		String send,empf,cp,hndshk,numb,error,type;
 		
@@ -86,7 +86,7 @@ public class Telegram {
 		return out;
 	}
 		
-	//Removes dots from in
+	//Removes dots from String
 	protected String removeDots(String in){
 		String out = null;
 		String[] split = in.split("\\.");
@@ -170,22 +170,6 @@ public class Telegram {
 
 	public void setType(String type) {
 		this._type = type;
-	}
-	
-	public String getsource() {
-		return _source;
-	}
-
-	public void setsource(String _source) {
-		this._source = _source;
-	}
-
-	public String getdest() {
-		return _dest;
-	}
-
-	public void setdest(String _dest) {
-		this._dest = _dest;
 	}
 
 }
