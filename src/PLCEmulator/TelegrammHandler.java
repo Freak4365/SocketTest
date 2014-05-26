@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * @author André Kukla
+ *
+ */
 public class TelegrammHandler {
 	private SocketTestServer server;
 	private int count_in;
@@ -29,19 +33,13 @@ public class TelegrammHandler {
 		count_out = 0;
 	}
 	
+	/**
+	 * @param inStr The String received from TCP-/IP-Connection
+	 */
 	public void handle(String inStr){
 		setCount_in(getCount_in() + 1);
 		Telegram in = new Telegram(inStr);
-		/*
-		String 	send = null, 
-				empf = null, 
-				cp = null, 
-				hndshk = null,  
-				//error = null, 
-				type = null;
-		int numb;	
-		*/
-		
+
 		String send = in.getSend();
 		String empf = in.getEmpf();
 		String cp = in.getCp();
@@ -49,7 +47,6 @@ public class TelegrammHandler {
 		//int numb = in.getNumb();
 		//String error = in.getError();
 		String type = in.getType();
-		//System.out.println("send: "+send+" empf: "+empf+" hndshk: "+hndshk+" numb: "+numb+" type: "+type);
 		
 		//Confirm Sync request, send start of sync
 		if(type.equals(Tele_Sync)){
@@ -116,17 +113,28 @@ public class TelegrammHandler {
 		}
 	}
 	
-	//Send telegram as String
+	/**
+	 * Sends a telegram to the TCP-/IP-Connection
+	 * @param tele Telegram as String to send.
+	 */
 	private void send(String tele){
 		server.sendMessage(tele);
 	}
 	
-	//Send telegram as object
+	/**
+	 * Sends a telegram to the TCP-/IP-Connection
+	 * @param tele Telegram as object to send.
+	 */
 	private void send(Telegram tele){
 		String out = tele.toString();
 		server.sendMessage(out);
 	}
 	
+	
+	/**
+	 * Build a telegram confirmation and send it.
+	 * @param in telegram to confirm
+	 */
 	private void confirmTelegram(Telegram in){
 		Telegram out = in;
 		
@@ -150,6 +158,9 @@ public class TelegrammHandler {
 		send(tele);
 	}
 
+	/**
+	 * Load properties from properties file
+	 */
 	private void loadProperties(){
 		Properties prop = new Properties();
 		InputStream input = null;
@@ -182,6 +193,9 @@ public class TelegrammHandler {
 		}
 	}
 
+	/**
+	 * @return Length of a telegram from properties file
+	 */
 	public int getTeleLenght(){
 		int len = Integer.parseInt(Tele_length);
 		return len;

@@ -31,6 +31,7 @@ public class SocketServer extends Thread {
         desonnected=cr;
         //parent.setClientSocket(null);
     }
+    
     //stop server
     public synchronized void setStop(boolean cr) {
         stop=cr;
@@ -47,7 +48,7 @@ public class SocketServer extends Thread {
         super("SocketServer");
         this.parent = parent;
         th = new TelegrammHandler(parent);
-        tele_length = 2*th.getTeleLenght();
+        tele_length = th.getTeleLenght();
         server=s;
         setStop(false);
         setDesonnected(false);
@@ -147,8 +148,8 @@ public class SocketServer extends Thread {
     
     private String readInputStream(BufferedReader _in)
     throws IOException {
-    	char[] buff = new char[tele_length];
-    	int read = _in.read(buff, 0, tele_length);
+    	char[] buff = new char[tele_length*2];
+    	int read = _in.read(buff, 0, tele_length*2);
     	String data = "";
     	
     	if(read != -1){
@@ -160,6 +161,10 @@ public class SocketServer extends Thread {
     	}
     	else{
     		return null;
+    	}
+    	
+    	if(read > tele_length){
+    		data = data.substring(0, tele_length);
     	}
     	
     	System.out.println("data: "+data);
