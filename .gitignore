@@ -1,0 +1,6 @@
+config
+trace
+./trace
+./config
+.trace
+.config
