@@ -1,18 +1,28 @@
 package PLCEmulator;
 
 public class warehouseTask {
-	//private handlingUnit hu;	
 	private String source;
 	private String dest;
+	private handlingUnit hu;
 	
-	public warehouseTask(String _source, String _dest){
+	public warehouseTask(String _hu, String _hutype, String _source, String _dest){
 		setSource(_source);
 		setDest(_dest);
+		setHu(new handlingUnit(_hu, _hutype));
 	}
 	
 	public warehouseTask(){
 		setSource("");
 		setDest("");
+	}
+	
+	/**
+	 * @param in Telegram_WT
+	 */
+	public warehouseTask(Telegram_WT in){
+		dest = in.getdest();
+		source = in.getsource();
+		hu = new handlingUnit(in.gethuid(), in.gethutype());
 	}
 
 	/**
@@ -41,6 +51,34 @@ public class warehouseTask {
 	 */
 	public void setDest(String dest) {
 		this.dest = dest;
+	}
+
+	/**
+	 * @return the Handling Unit
+	 */
+	public handlingUnit getHu() {
+		return hu;
+	}
+
+	/**
+	 * @param hu the Handling Unit to set
+	 */
+	public void setHu(handlingUnit hu) {
+		this.hu = hu;
+	}
+	
+	/**
+	 * @return the Handling Unit Type
+	 */
+	public String getHuType(){
+		return hu.getType();
+	}
+	
+	/**
+	 * @return the Handling Unit ID
+	 */
+	public String getHuId(){
+		return hu.getId();
 	}
 
 }

@@ -1,9 +1,6 @@
 package PLCEmulator;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.ArrayList;
 
 /**
  * @author André Kukla
@@ -24,18 +21,31 @@ public class TelegrammHandler {
 	private String Tele_hndshk_Req;
 	private String Tele_hndshk_Conf;
 	private String Tele_length;
+	private ArrayList<warehouseTask> wt_list; 
 	
 	
 	public TelegrammHandler(SocketTestServer s){
 		server = s;
-		loadProperties();
 		setCount_in(0);
 		count_out = 0;
+		Tele_Sync = SocketTest.Tele_Sync;
+		Tele_Sync_start = SocketTest.Tele_Sync_start;
+		Tele_Sync_end  = SocketTest.Tele_Sync_end;
+		Tele_Life = SocketTest.Tele_Life;
+		Tele_Sysr = SocketTest.Tele_Sysr;
+		Tele_Stat = SocketTest.Tele_Stat;
+		Tele_Wt = SocketTest.Tele_Wt;
+		Tele_Wtco = SocketTest.Tele_Wtco;
+		Tele_hndshk_Req = SocketTest.Tele_hndshk_Req;
+		Tele_hndshk_Conf = SocketTest.Tele_hndshk_Conf;
+		Tele_length = SocketTest.Tele_length;
+		wt_list = new ArrayList<warehouseTask>();
 	}
 	
 	/**
 	 * @param inStr The String received from TCP-/IP-Connection
 	 */
+	@SuppressWarnings("unchecked")
 	public void handle(String inStr){
 		setCount_in(getCount_in() + 1);
 		Telegram in = new Telegram(inStr);
@@ -92,8 +102,7 @@ public class TelegrammHandler {
 		}
 		//Confirm warehouse task telegram
 		else if(type.equals(Tele_Wt)&&hndshk.equals(Tele_hndshk_Req)){
-			//confirmTelegram(in);
-			
+			/*
 			//Confirm WT request telegram
 			Telegram_WT _in = new Telegram_WT(inStr);
 			Telegram_WT conf = _in;
@@ -110,6 +119,19 @@ public class TelegrammHandler {
 			wt_conf.setNumb(count_out++);
 			wt_conf.setType(Tele_Wtco);
 			send(wt_conf);
+			*/
+			Telegram_WT _in = new Telegram_WT(inStr);
+			confirmTelegram(_in);
+			
+			warehouseTask wt = new warehouseTask(_in);
+			wt_list.add(wt);
+			
+			int length = wt_list.size();
+			String[] list = new String[length];
+	    	for(int i=0;i<length;i++) {
+				list[i]=wt_list.get(i).getHuId().toString();
+			}
+	    	server.setWtListData(list);
 		}
 	}
 	
@@ -129,68 +151,58 @@ public class TelegrammHandler {
 		String out = tele.toString();
 		server.sendMessage(out);
 	}
-	
-	
+		
 	/**
 	 * Build a telegram confirmation and send it.
+	 * Sender and receiver are exchanged, handshake is changed.
 	 * @param in telegram to confirm
 	 */
 	private void confirmTelegram(Telegram in){
 		Telegram out = in;
-		
-		//switch sender and receiver
-		String send = in.getSend();
-		String empf = in.getEmpf();
-		out.setEmpf(send);
-		out.setSend(empf);
-		
-		//switch handshake
-		String hndshk = in.getHndshk();
-		if(hndshk.equals(Tele_hndshk_Req)){
-			out.setHndshk(Tele_hndshk_Conf);
-		}
-		else{
-			out.setHndshk(Tele_hndshk_Req);
-		}
-		
-		//convert telegram to String and return String
+		out.switchSendRec();
+		out.changeHndshk();
 		String tele = out.toString();
 		send(tele);
 	}
-
-	/**
-	 * Load properties from properties file
-	 */
-	private void loadProperties(){
-		Properties prop = new Properties();
-		InputStream input = null;
-		
-		try {
-			input = new FileInputStream("config/config.properties");
-			
-			prop.load(input);
-
-			Tele_Sync = (prop.getProperty("Sync"));
-			Tele_Sync_start = (prop.getProperty("Sync_Start"));
-			Tele_Sync_end = (prop.getProperty("Sync_End"));
-			Tele_Life = (prop.getProperty("Life"));
-			Tele_Sysr = (prop.getProperty("Stat_Req"));
-			Tele_Stat = (prop.getProperty("Stat_Msg"));
-			Tele_hndshk_Req = (prop.getProperty("Handshake_Request"));
-			Tele_hndshk_Conf = (prop.getProperty("Handshake_Confirm"));
-			Tele_length = (prop.getProperty("Telegram_length"));
-	 
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	
+	public void sendStateMsg(String cp, String error){
+		String stat = new TelegrammBuilder()
+								.sender(SocketTest.Name_PLC)
+								.reciever(SocketTest.Name_EWM)
+								.cp(cp)
+								.hndshk(Tele_hndshk_Req)
+								.numb(count_out++)
+								.type(Tele_Stat)
+								.mfs_error(error)
+										.buildTelegram()
+											.toString();
+		send(stat);
+	}
+	
+	public void confirmWt(String hu, String hutype, String source, String dest, String mfs_error){
+		String wtco = new TelegrammBuilder()
+							.sender(SocketTest.Name_PLC)
+							.reciever(SocketTest.Name_EWM)
+							.hndshk(Tele_hndshk_Req)
+							.numb(count_out++)
+							.type(Tele_Wtco)
+							.huid(hu)
+							.hutype(hutype)
+							.source(source)
+							.dest(dest)
+							.mfs_error(mfs_error)
+									.buildTelegram()
+										.toString();
+		send(wtco);
+	}
+	
+	public void confirmWt(int index){
+		warehouseTask wt = wt_list.get(index);
+		confirmWt(wt);
+	}
+	
+	public void confirmWt(warehouseTask _wt){
+		confirmWt(_wt.getHuId(), _wt.getHuType(), _wt.getSource(), _wt.getDest(),"");
 	}
 
 	/**

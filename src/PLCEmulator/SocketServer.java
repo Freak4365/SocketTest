@@ -171,4 +171,8 @@ public class SocketServer extends Thread {
         System.out.println("Len got : "+read);
         return data;
     }
+    
+    public TelegrammHandler getTh(){
+    	return th;
+    }
 }

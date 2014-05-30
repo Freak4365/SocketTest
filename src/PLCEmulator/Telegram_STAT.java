@@ -17,7 +17,7 @@ public class Telegram_STAT extends Telegram {
 			String _hndshk, int _numb, String _error, String _type, String _source, 
 			String _dest, String _mfs_error, String _cs, String _csgr, String _rsrc) 
 	{
-		super(_send, _empf, _cp, _hndshk, _numb, _error, _type);
+		super(_send, _empf, _cp, _hndshk, _numb, _error, _type, "");
 		setsource(_source);
 		setdest(_dest);
 		setmfs_error(_mfs_error);

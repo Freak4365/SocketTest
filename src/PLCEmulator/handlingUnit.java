@@ -5,6 +5,10 @@ public class handlingUnit {
 	private String id;
 	private String type;
 	
+	/**
+	 * @param _id HU ID
+	 * @param _type HU type
+	 */
 	public handlingUnit(String _id, String _type){
 		setId(_id);
 		setType(_type);

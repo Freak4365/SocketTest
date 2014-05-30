@@ -19,7 +19,6 @@ public class TelegrammBuilder {
 	private String rsrc;
 	//WTCO: CONV1...EWM.......................A.00000000000000000004....WTCO00000000001000000136E1......CP02..............CP03..............
 	
-	//constructor for builder pattern
 	public TelegrammBuilder(){
 		 send = "";
 		 empf = "";
@@ -38,17 +37,20 @@ public class TelegrammBuilder {
 	}
 	
 	public Telegram buildTelegram(){
-		//Telegram t = new Telegram(send, empf, cp, hndshk, numb, error, type, huid, hutype, source, dest, mfs_error, cs, csgr, rsrc);
-		if(type.equals("STAT")||type.equals("SYSR")){
+		if(type.equals(SocketTest.Tele_Stat)||type.equals(SocketTest.Tele_Sysr)){
 			Telegram_STAT t = new Telegram_STAT(send, empf, cp, hndshk, numb, error, type, source, dest, mfs_error, cs, csgr, rsrc);
 			return t;
 		}
-		else if(type.equals("WT")||type.equals("WTCO")||type.equals("WTCC")){
+		else if(type.equals(SocketTest.Tele_Wt)||type.equals(SocketTest.Tele_Wtco)||type.equals("WTCC")){
 			Telegram_WT t = new Telegram_WT(send, empf, cp, hndshk, numb, error, type, huid, hutype, source, dest, mfs_error);
 			return t;
 		}
+		else if(type.equals("")){
+			//Throw exception
+			return null;
+		}
 		else{
-			Telegram t = new Telegram(send, empf, cp, hndshk, numb, error, type);
+			Telegram t = new Telegram(send, empf, cp, hndshk, numb, error, type, mfs_error);
 			return t;
 		}
 	}

@@ -1,6 +1,8 @@
 package PLCEmulator;
-/*
+
+/**
  * Parent class for all telegrams
+ * @author André Kukla
  */
 public class Telegram {
 	
@@ -8,13 +10,14 @@ public class Telegram {
 	private String _empf;
 	private String _cp;
 	private String _hndshk;
-	//private String _numb;
 	private int _numb;
+	private String _mfs_error;
 	private String _error;
 	private String _type;
 	
+	
 	public Telegram(String _send, String _empf, String _cp, String _hndshk, int _numb,
-			String _error, String _type)
+			String _error, String _type, String _mfserror)
 	{
 		setSend(_send);
 		setEmpf(_empf);
@@ -23,6 +26,7 @@ public class Telegram {
 		setNumb(_numb);
 		setError(_error);
 		setType(_type);
+		setMfserror(_mfserror);
 	}
 	
 	public Telegram(String in){
@@ -34,11 +38,15 @@ public class Telegram {
 		_numb = stringToInt(getFromTele(in, 36, 56));
 		_error = getFromTele(in, 56, 60);
 		_type = getFromTele(in, 60, 64);
+		_mfs_error = "";
 	}
 	
-	//Converts telegram to String, spaces are filled up with filler.
+	/**
+	 * Converts telegram to String, spaces are filled up with filler
+	 * @return Telegram string
+	 */
 	public String toString(){
-		String send,empf,cp,hndshk,numb,error,type, end;
+		String send,empf,cp,hndshk,numb,error,type, end, mfserror;
 		
 		send = addDots(_send, 8);
 		empf = addDots(_empf, 8);
@@ -47,13 +55,17 @@ public class Telegram {
 		numb = addDots(intToString(_numb), 20);
 		error = addDots(_error, 4);
 		type = addDots(_type, 4);
-		end = addDots("", 64);
+		end = addDots("", 60);
+		mfserror = addDots(_mfs_error, 4);
 
-		String out = send+empf+cp+hndshk+numb+error+type+end;
+		String out = send+empf+cp+hndshk+numb+error+type+end+mfserror;
 		return out;
 	}
-	
-	//Converts telegram to String, end is not filled up with filler.
+
+	/**
+	 * Converts Telegram to String, the end is not filled up with filler
+	 * @return Telegram string
+	 */
 	public String toStringShort(){
 		String send,empf,cp,hndshk,numb,error,type;
 		
@@ -77,8 +89,14 @@ public class Telegram {
 		}
 		return out;
 	}
-	
-	//Returns String from start to end and removes all dots
+
+	/**
+	 * Returns String from start to end and removes all dots
+	 * @param in input String
+	 * @param start number of start position
+	 * @param end number of end position
+	 * @return output String
+	 */
 	protected String getFromTele(String in, int start, int end){
 		String out = null;
 		out = in.substring(start,end);
@@ -114,6 +132,23 @@ public class Telegram {
 		return out;
 	}
 	
+	/**
+	 * Switch sender and receiver
+	 */
+	public void switchSendRec(){
+		String temp = _send;
+		_send = _empf;
+		_empf = temp;
+	}
+	
+	public void changeHndshk(){
+		if(_hndshk.equals(SocketTest.Tele_hndshk_Req)){
+			_hndshk = SocketTest.Tele_hndshk_Conf;
+		}
+		else{
+			_hndshk = SocketTest.Tele_hndshk_Req;
+		}
+	}
 	//getters and setters
 	
 	public String getSend() {
@@ -170,6 +205,20 @@ public class Telegram {
 
 	public void setType(String type) {
 		this._type = type;
+	}
+
+	/**
+	 * @return the _mfserror
+	 */
+	public String getMfserror() {
+		return _mfs_error;
+	}
+
+	/**
+	 * @param _mfserror the _mfserror to set
+	 */
+	public void setMfserror(String _mfserror) {
+		this._mfs_error = _mfserror;
 	}
 
 }

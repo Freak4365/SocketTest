@@ -25,25 +25,35 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     private JPanel buttonPanel;
     private JPanel sendPanel;
     
+    private JPanel rightPanel;
+    private JPanel rightTopPanel;
+    
+    //TopPanel
+    	//ToPanel
     private JLabel ipLabel = new JLabel("IP Address");
     private JLabel portLabel = new JLabel("Port");
-    //private JLabel logoLabel = new JLabel("PLC Emulator v 1.0", logo, JLabel.CENTER);
-    //private JTextField ipField = new JTextField("0.0.0.0",20);
     private JTextField ipField = new JTextField("178.212.112.147",20);
-    //private JTextField portField = new JTextField("21",10);
-    private JTextField portField = new JTextField("5000",10);
+    private JTextField portField = new JTextField("5001",10);
     private JButton connectButton = new JButton("Start Listening");
     
+    //Center Panel
+    	//Text Panel
     private JLabel convLabel = new JLabel("Conversation with Client");
     private Border connectedBorder = BorderFactory.createTitledBorder(new EtchedBorder(),"Connected Client : < NONE >");
     private JTextArea messagesField = new JTextArea();
-    
-    private JLabel sendLabel = new JLabel("Message");
-    private JTextField sendField = new JTextField();
-    
-    private JButton sendButton = new JButton("Send");
+    	//Send Panel
+    private JButton sendWtcoButton = new JButton("Confirm WT");
+    private JButton sendStateButton = new JButton("State");
     private JButton disconnectButton = new JButton("Disconnect");
+    	//ButtonPanel
     private JButton clearButton = new JButton("Clear");
+    	//Right Panel
+    String[] data = {""};
+    private JList<String> list = new JList<String>(data);
+    private JScrollPane scroll_list = new JScrollPane(list);
+    private JButton confirmButton = new JButton("Confirm");
+    private JButton showButton = new JButton("Show");
+    
     
     private GridBagConstraints gbc = new GridBagConstraints();
     
@@ -51,6 +61,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     private ServerSocket server;
     private SocketServer socketServer;
     private BufferedWriter out;
+    private TelegrammHandler th;
     
     protected final JFrame parent;
     
@@ -129,7 +140,6 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         */
         topPanel.setBorder(BorderFactory.createEmptyBorder(10,10,5,10));
         
-        
         textPanel = new JPanel();
         textPanel.setLayout(new BorderLayout(0,5));
         textPanel.add(convLabel,BorderLayout.NORTH);
@@ -148,35 +158,65 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
-        sendPanel.add(sendLabel, gbc);
+        
+        sendWtcoButton.setEnabled(false);
+        sendWtcoButton.setToolTipText("Confirm warehouse task");
+        ActionListener sendWtcoListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	JTextField hu = new JTextField();
+            	JTextField hutype = new JTextField();
+            	JTextField source = new JTextField();
+        		JTextField dest = new JTextField();
+                        Object[] message = {"HU-ID", hu, 
+                		"HU type", hutype, "Source", source, "Destination", dest};
+                        hutype.setText("E1");
+         
+                        JOptionPane pane = new JOptionPane( message, 
+                                                        JOptionPane.PLAIN_MESSAGE, 
+                                                        JOptionPane.OK_CANCEL_OPTION);
+                        pane.createDialog(null, "Confirm warehouse task").setVisible(true);
+                        
+                        if(hu.getText()!="" && hutype.getText()!="" && source.getText()!="" && dest.getText()!=""){
+                        	th.confirmWt(hu.getText(), hutype.getText(), source.getText(), dest.getText(), "");
+                        }
+                        
+            }
+        };
+        sendWtcoButton.addActionListener(sendWtcoListener);
+        sendPanel.add(sendWtcoButton, gbc);
+        /*
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         sendField.setEditable(false);
         sendPanel.add(sendField, gbc);
+        */
         gbc.gridx = 2;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
-        sendButton.setEnabled(false);
-        sendButton.setToolTipText("Send text to client");
-        ActionListener sendListener = new ActionListener() {
+        sendStateButton.setEnabled(false);
+        sendStateButton.setToolTipText("Send state message");
+        ActionListener sendStateListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String msg = sendField.getText();
-                if(!msg.equals(""))
-                    sendMessage(msg);
-                else {
-                    int value = JOptionPane.showConfirmDialog(
-                            SocketTestServer.this,  "Send Blank Line ?",
-                            "Send Data To Client",
-                            JOptionPane.YES_NO_OPTION);
-                    if (value == JOptionPane.YES_OPTION)
-                        sendMessage(msg);
-                }
+            	JTextField cp = new JTextField();
+        		JTextField fehler = new JTextField();
+                        Object[] message = {"CP", cp, 
+                		"Fehler", fehler};
+         
+                        JOptionPane pane = new JOptionPane( message, 
+                                                        JOptionPane.PLAIN_MESSAGE, 
+                                                        JOptionPane.OK_CANCEL_OPTION);
+                        pane.createDialog("State message").setVisible(true);
+                        
+                        if(cp.getText()!= "" && fehler.getText()!=""){
+                        	th.sendStateMsg(cp.getText(), fehler.getText());
+                        }
             }
         };
-        sendButton.addActionListener(sendListener);
-        sendField.addActionListener(sendListener);
-        sendPanel.add(sendButton, gbc);
+        sendStateButton.addActionListener(sendStateListener);
+        //sendField.addActionListener(sendListener);
+        sendPanel.add(sendStateButton, gbc);
+        
         ActionListener disconnectListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 disconnect();
@@ -230,9 +270,44 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
                 connectedBorder);
         centerPanel.setBorder(cb);
         
+        rightTopPanel = new JPanel();
+        rightTopPanel.setLayout(new BorderLayout(5,0));
+        ActionListener showWtListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String s = list.getSelectedValue().toString();
+                JOptionPane.showConfirmDialog(null,                       
+                        "Sie haben den WT "+s+" ausgewählt.",
+                        "Ihre Auswahl",
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+            }
+        };
+        showButton.addActionListener(showWtListener);
+        rightTopPanel.add(showButton,BorderLayout.WEST);
+        ActionListener confirmWtListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int i = list.getSelectedIndex();
+                if(i != -1){
+                	th.confirmWt(i);
+                }
+            }
+        };
+        confirmButton.addActionListener(confirmWtListener);
+        rightTopPanel.add(confirmButton,BorderLayout.EAST);
+        rightTopPanel.setBorder(BorderFactory.createEmptyBorder(3,0,3,0) );
+        
+        rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout(5,0));
+        rightPanel.add(rightTopPanel, BorderLayout.NORTH);
+        rightPanel.add(scroll_list,BorderLayout.CENTER);
+        rightPanel.setBorder(
+        		new CompoundBorder(
+                BorderFactory.createTitledBorder(new EtchedBorder(),"Warehousetasks"),
+                BorderFactory.createEmptyBorder(7,3,7,3) ));
+        
         cp.setLayout(new BorderLayout(10,0));
         cp.add(topPanel,BorderLayout.NORTH);
         cp.add(centerPanel,BorderLayout.CENTER);
+        cp.add(rightPanel,BorderLayout.EAST);
     }
     
 
@@ -307,6 +382,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         writeTrace("> Server Started on Port: "+portNo);
         append("> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         socketServer=SocketServer.handle(this,server);
+        th = socketServer.getTh();
         //sendField.requestFocus();
     }
     //disconnect a client
@@ -337,15 +413,17 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             out=null;
             socket = null;
             changeBorder(null);
-            sendButton.setEnabled(false);
-            sendField.setEditable(false);
+            sendStateButton.setEnabled(false);
+            sendWtcoButton.setEnabled(false);
+            //sendField.setEditable(false);
             disconnectButton.setEnabled(false);
         } else {
             socket = s;
             changeBorder(" "+socket.getInetAddress().getHostName()+
                     " ["+socket.getInetAddress().getHostAddress()+"] ");
-            sendButton.setEnabled(true);
-            sendField.setEditable(true);
+            sendStateButton.setEnabled(true);
+            sendWtcoButton.setEnabled(true);
+            //sendField.setEditable(true);
             disconnectButton.setEnabled(true);
         }
     }
@@ -385,7 +463,6 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             append("Gesendet: "+s);
             out.write(s);
             out.flush();
-            sendField.setText("");
             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         } catch (Exception e) {
             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -414,8 +491,12 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     private static void writeTrace(String DataIn){
     	java.util.Date now = new java.util.Date();
     	java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy HH.mm.ss");
-    	String trace = "EWM: " + sdf.format(now) + "\r\n" + DataIn;
+    	String trace = sdf.format(now) + ": \r\n" + DataIn;
     	Util.writeTrace(trace);
+    }
+    
+    public void setWtListData(String[] data){
+    	list.setListData(data);
     }
 }
 

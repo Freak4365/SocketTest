@@ -16,7 +16,7 @@ public class Telegram_WT extends Telegram {
 			int _numb, String _error, String _type, String _huid,
 			String _hutype, String _source, String _dest, String _mfs_error) {
 		
-		super(_send, _empf, _cp, _hndshk, _numb, _error, _type);
+		super(_send, _empf, _cp, _hndshk, _numb, _error, _type, "");
 		sethuid(_huid);
 		sethutype(_hutype);
 		setsource(_source);
