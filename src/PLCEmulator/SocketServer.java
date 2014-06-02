@@ -132,7 +132,6 @@ public class SocketServer extends Thread {
                     parent.append("> Server closed Client connection.");
                 break;
             }
-            
             if (rec != null) {
             	parent.append("Empfangen: "+rec);
             	if(rec.length()>0){

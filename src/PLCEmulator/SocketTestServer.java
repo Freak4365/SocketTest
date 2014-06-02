@@ -28,6 +28,9 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     private JPanel rightPanel;
     private JPanel rightTopPanel;
     
+    private JPanel leftPanel;
+    private JPanel leftTopPanel;
+    
     //TopPanel
     	//ToPanel
     private JLabel ipLabel = new JLabel("IP Address");
@@ -47,13 +50,21 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     private JButton disconnectButton = new JButton("Disconnect");
     	//ButtonPanel
     private JButton clearButton = new JButton("Clear");
-    	//Right Panel
+    
+    //Right Panel
     String[] data = {""};
-    private JList<String> list = new JList<String>(data);
-    private JScrollPane scroll_list = new JScrollPane(list);
+    private JList<String> wt_list = new JList<String>(data);
+    private JScrollPane wt_scroll_list = new JScrollPane(wt_list);
+    	//Right top panel
     private JButton confirmButton = new JButton("Confirm");
     private JButton showButton = new JButton("Show");
     
+    //Left Panel
+    private JList<String> cp_list = new JList<String>(data);
+    private JScrollPane cp_scroll_list = new JScrollPane(cp_list);
+    	//Left top panel
+    private JButton errorButton = new JButton("Set Error");
+    private JButton cpshowButton = new JButton("Show");
     
     private GridBagConstraints gbc = new GridBagConstraints();
     
@@ -176,10 +187,10 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
                                                         JOptionPane.OK_CANCEL_OPTION);
                         pane.createDialog(null, "Confirm warehouse task").setVisible(true);
                         
-                        if(hu.getText()!="" && hutype.getText()!="" && source.getText()!="" && dest.getText()!=""){
-                        	th.confirmWt(hu.getText(), hutype.getText(), source.getText(), dest.getText(), "");
-                        }
-                        
+                        int value = ((Integer)pane.getValue()).intValue();	                        
+    	                if(value == JOptionPane.OK_OPTION) {	
+    	                	th.confirmWt(hu.getText(), hutype.getText(), source.getText(), dest.getText(), "");
+    	                }
             }
         };
         sendWtcoButton.addActionListener(sendWtcoListener);
@@ -207,10 +218,11 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
                                                         JOptionPane.PLAIN_MESSAGE, 
                                                         JOptionPane.OK_CANCEL_OPTION);
                         pane.createDialog("State message").setVisible(true);
-                        
-                        if(cp.getText()!= "" && fehler.getText()!=""){
-                        	th.sendStateMsg(cp.getText(), fehler.getText());
-                        }
+
+                        int value = ((Integer)pane.getValue()).intValue();	                        
+    	                if(value == JOptionPane.OK_OPTION) {	
+    	                	th.sendStateMsg(cp.getText(), fehler.getText());
+    	                }
             }
         };
         sendStateButton.addActionListener(sendStateListener);
@@ -265,29 +277,44 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         centerPanel.add(buttonPanel,BorderLayout.SOUTH);
         centerPanel.add(textPanel,BorderLayout.CENTER);
         
-        CompoundBorder cb=new CompoundBorder(
-                BorderFactory.createEmptyBorder(5,10,10,10),
-                connectedBorder);
+        //CompoundBorder cb=new CompoundBorder(BorderFactory.createEmptyBorder(5,10,10,10),connectedBorder);
+        CompoundBorder cb=new CompoundBorder(connectedBorder, BorderFactory.createEmptyBorder(10,10,10,10));
         centerPanel.setBorder(cb);
         
+        //right top panel
         rightTopPanel = new JPanel();
         rightTopPanel.setLayout(new BorderLayout(5,0));
         ActionListener showWtListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String s = list.getSelectedValue().toString();
-                JOptionPane.showConfirmDialog(null,                       
-                        "Sie haben den WT "+s+" ausgewählt.",
-                        "Ihre Auswahl",
-                        JOptionPane.YES_NO_CANCEL_OPTION);
+                int i = wt_list.getSelectedIndex();
+                if(i != -1){
+	                String[] s = th.getWtInfo(i);
+	                if(s!=null){
+		                JOptionPane.showConfirmDialog(null,                       
+		                        "HU-Number: "+s[0]+NEW_LINE+"HU Type: "+s[1]+NEW_LINE+"Source: "+s[2]+NEW_LINE+"Destination: "+s[3],
+		                        "Warehouse Task",
+		                        JOptionPane.OK_CANCEL_OPTION);
+	                }
+                }
             }
         };
         showButton.addActionListener(showWtListener);
         rightTopPanel.add(showButton,BorderLayout.WEST);
         ActionListener confirmWtListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int i = list.getSelectedIndex();
+                int i = wt_list.getSelectedIndex();
                 if(i != -1){
-                	th.confirmWt(i);
+                	String[] s = th.getWtInfo(i);
+	                if(s!=null){
+		                int value = JOptionPane.showConfirmDialog(null,                       
+		                        "HU-Number: "+s[0]+NEW_LINE+"HU Type: "+s[1]+NEW_LINE+"Source: "+s[2]+NEW_LINE+"Destination: "+s[3]+NEW_LINE+
+		                        "Do you really want to confirm this warehouse task?",
+		                        "Are you sure?",
+		                        JOptionPane.YES_NO_OPTION);
+		                if(i != -1 && value == JOptionPane.YES_OPTION){
+		                	th.confirmWt(i);
+		                }
+	                }
                 }
             }
         };
@@ -295,19 +322,73 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         rightTopPanel.add(confirmButton,BorderLayout.EAST);
         rightTopPanel.setBorder(BorderFactory.createEmptyBorder(3,0,3,0) );
         
+        //right panel
         rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout(5,0));
         rightPanel.add(rightTopPanel, BorderLayout.NORTH);
-        rightPanel.add(scroll_list,BorderLayout.CENTER);
+        rightPanel.add(wt_scroll_list,BorderLayout.CENTER);
         rightPanel.setBorder(
         		new CompoundBorder(
                 BorderFactory.createTitledBorder(new EtchedBorder(),"Warehousetasks"),
                 BorderFactory.createEmptyBorder(7,3,7,3) ));
         
+        //left top panel
+        leftTopPanel = new JPanel();
+        leftTopPanel.setLayout(new BorderLayout(5,0));
+        ActionListener showCpListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int i = cp_list.getSelectedIndex();
+                if(i != -1){
+	                String[] s = th.getCpInfo(i);
+	                JOptionPane.showConfirmDialog(null,                       
+	                        "Name: "+s[0]+NEW_LINE+"Error: "+s[1]+NEW_LINE+"HU: "+s[2],
+	                        "Communication Point",
+	                        JOptionPane.OK_CANCEL_OPTION);
+                }
+            }
+        };
+        cpshowButton.addActionListener(showCpListener);
+        leftTopPanel.add(cpshowButton,BorderLayout.WEST);
+        ActionListener cpErrorListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int i = cp_list.getSelectedIndex();
+                if(i != -1){
+	        		JTextField fehler = new JTextField();
+	                Object[] message = {"Fehler", fehler};
+	         
+	                JOptionPane pane = new JOptionPane( message, 
+	                                                    JOptionPane.PLAIN_MESSAGE, 
+	                                                    JOptionPane.OK_CANCEL_OPTION);
+	                pane.createDialog("Set Error").setVisible(true);
+
+	                int value = ((Integer)pane.getValue()).intValue();	                        
+	                if(value == JOptionPane.OK_OPTION) {	
+	                   th.setCpError(i,fehler.getText());
+	                }
+	                
+	            }
+            }
+        };
+        errorButton.addActionListener(cpErrorListener);
+        leftTopPanel.add(errorButton,BorderLayout.EAST);
+        leftTopPanel.setBorder(BorderFactory.createEmptyBorder(3,0,3,0) );
+        
+        //left panel
+        leftPanel = new JPanel();
+        leftPanel.setLayout(new BorderLayout(5,0));
+        leftPanel.add(leftTopPanel, BorderLayout.NORTH);
+        leftPanel.add(cp_scroll_list,BorderLayout.CENTER);
+        leftPanel.setBorder(
+        		new CompoundBorder(
+                BorderFactory.createTitledBorder(new EtchedBorder(),"Check Points"),
+                BorderFactory.createEmptyBorder(7,3,7,3) ));
+        
+        //content pane
         cp.setLayout(new BorderLayout(10,0));
         cp.add(topPanel,BorderLayout.NORTH);
         cp.add(centerPanel,BorderLayout.CENTER);
         cp.add(rightPanel,BorderLayout.EAST);
+        cp.add(leftPanel,BorderLayout.WEST);
     }
     
 
@@ -480,9 +561,8 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         else
             connectedBorder = BorderFactory.createTitledBorder(
                     new EtchedBorder(), "Connected Client : < "+ip+" >");
-        CompoundBorder cb=new CompoundBorder(
-                BorderFactory.createEmptyBorder(5,10,10,10),
-                connectedBorder);
+        //CompoundBorder cb=new CompoundBorder(BorderFactory.createEmptyBorder(5,10,10,10),connectedBorder);
+        CompoundBorder cb=new CompoundBorder(connectedBorder, BorderFactory.createEmptyBorder(5,10,10,10));
         centerPanel.setBorder(cb);
         invalidate();
         repaint();
@@ -496,7 +576,11 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     }
     
     public void setWtListData(String[] data){
-    	list.setListData(data);
+    	wt_list.setListData(data);
+    }
+    
+    public void setCpListData(String[] data){
+    	cp_list.setListData(data);
     }
 }
 

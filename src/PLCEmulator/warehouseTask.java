@@ -4,6 +4,7 @@ public class warehouseTask {
 	private String source;
 	private String dest;
 	private handlingUnit hu;
+	private String confCp;
 	
 	public warehouseTask(String _hu, String _hutype, String _source, String _dest){
 		setSource(_source);
@@ -14,6 +15,7 @@ public class warehouseTask {
 	public warehouseTask(){
 		setSource("");
 		setDest("");
+		setConfCp("");
 	}
 	
 	/**
@@ -79,6 +81,20 @@ public class warehouseTask {
 	 */
 	public String getHuId(){
 		return hu.getId();
+	}
+
+	/**
+	 * @return the confCp
+	 */
+	public String getConfCp() {
+		return confCp;
+	}
+
+	/**
+	 * @param confCp the confCp to set
+	 */
+	public void setConfCp(String confCp) {
+		this.confCp = confCp;
 	}
 
 }
