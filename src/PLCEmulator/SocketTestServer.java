@@ -47,6 +47,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     	//Send Panel
     private JButton sendWtcoButton = new JButton("Confirm WT");
     private JButton sendStateButton = new JButton("State");
+    private JButton sendSPButton = new JButton("SP");
     private JButton disconnectButton = new JButton("Disconnect");
     	//ButtonPanel
     private JButton clearButton = new JButton("Clear");
@@ -65,7 +66,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     	//Left top panel
     private JButton errorButton = new JButton("Set Error");
     private JButton cpshowButton = new JButton("Show");
-    
+
     private GridBagConstraints gbc = new GridBagConstraints();
     
     private Socket socket;
@@ -229,12 +230,37 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         //sendField.addActionListener(sendListener);
         sendPanel.add(sendStateButton, gbc);
         
-        ActionListener disconnectListener = new ActionListener() {
+        gbc.gridx = 3;
+        sendSPButton.setEnabled(false);
+        sendSPButton.setToolTipText("Send SP message");
+        ActionListener spListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                disconnect();
+            	JTextField hu = new JTextField();
+        		JTextField hutype = new JTextField();
+                        Object[] message = {"HU", hu, 
+                		"HU Type", hutype};
+         
+                        JOptionPane pane = new JOptionPane( message, 
+                                                        JOptionPane.PLAIN_MESSAGE, 
+                                                        JOptionPane.OK_CANCEL_OPTION);
+                        pane.createDialog("Start Point").setVisible(true);
+
+                        int value = ((Integer)pane.getValue()).intValue();	                        
+    	                if(value == JOptionPane.OK_OPTION) {	
+    	                	th.sendSPMsg(hu.getText(), hutype.getText(), "CP01");
+    	                }
             }
         };
-        gbc.gridx = 3;
+        sendSPButton.addActionListener(spListener);
+        sendPanel.add(sendSPButton, gbc);
+        
+        ActionListener disconnectListener = new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		disconnect();
+        	}
+        };
+        
+        gbc.gridx = 4;
         disconnectButton.addActionListener(disconnectListener);
         disconnectButton.setEnabled(false);
         sendPanel.add(disconnectButton, gbc);
@@ -277,8 +303,8 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         centerPanel.add(buttonPanel,BorderLayout.SOUTH);
         centerPanel.add(textPanel,BorderLayout.CENTER);
         
-        //CompoundBorder cb=new CompoundBorder(BorderFactory.createEmptyBorder(5,10,10,10),connectedBorder);
-        CompoundBorder cb=new CompoundBorder(connectedBorder, BorderFactory.createEmptyBorder(10,10,10,10));
+        CompoundBorder cb=new CompoundBorder(BorderFactory.createEmptyBorder(5,0,10,0),connectedBorder);
+        //CompoundBorder cb=new CompoundBorder(connectedBorder, BorderFactory.createEmptyBorder(10,10,10,10));
         centerPanel.setBorder(cb);
         
         //right top panel
@@ -289,7 +315,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
                 int i = wt_list.getSelectedIndex();
                 if(i != -1){
 	                String[] s = th.getWtInfo(i);
-	                if(s!=null){
+	                if(s[1]!=null){
 		                JOptionPane.showConfirmDialog(null,                       
 		                        "HU-Number: "+s[0]+NEW_LINE+"HU Type: "+s[1]+NEW_LINE+"Source: "+s[2]+NEW_LINE+"Destination: "+s[3],
 		                        "Warehouse Task",
@@ -299,6 +325,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             }
         };
         showButton.addActionListener(showWtListener);
+        showButton.setEnabled(false);
         rightTopPanel.add(showButton,BorderLayout.WEST);
         ActionListener confirmWtListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -319,6 +346,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             }
         };
         confirmButton.addActionListener(confirmWtListener);
+        confirmButton.setEnabled(false);
         rightTopPanel.add(confirmButton,BorderLayout.EAST);
         rightTopPanel.setBorder(BorderFactory.createEmptyBorder(3,0,3,0) );
         
@@ -329,8 +357,8 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         rightPanel.add(wt_scroll_list,BorderLayout.CENTER);
         rightPanel.setBorder(
         		new CompoundBorder(
-                BorderFactory.createTitledBorder(new EtchedBorder(),"Warehousetasks"),
-                BorderFactory.createEmptyBorder(7,3,7,3) ));
+        				BorderFactory.createEmptyBorder(5,5,10,10), 
+        				BorderFactory.createTitledBorder(new EtchedBorder(),"Warehousetasks")));
         
         //left top panel
         leftTopPanel = new JPanel();
@@ -347,6 +375,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
                 }
             }
         };
+        cpshowButton.setEnabled(false);
         cpshowButton.addActionListener(showCpListener);
         leftTopPanel.add(cpshowButton,BorderLayout.WEST);
         ActionListener cpErrorListener = new ActionListener() {
@@ -370,6 +399,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             }
         };
         errorButton.addActionListener(cpErrorListener);
+        errorButton.setEnabled(false);
         leftTopPanel.add(errorButton,BorderLayout.EAST);
         leftTopPanel.setBorder(BorderFactory.createEmptyBorder(3,0,3,0) );
         
@@ -380,8 +410,8 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         leftPanel.add(cp_scroll_list,BorderLayout.CENTER);
         leftPanel.setBorder(
         		new CompoundBorder(
-                BorderFactory.createTitledBorder(new EtchedBorder(),"Check Points"),
-                BorderFactory.createEmptyBorder(7,3,7,3) ));
+        				BorderFactory.createEmptyBorder(5,10,10,5),
+        				BorderFactory.createTitledBorder(new EtchedBorder(),"Check Points")));
         
         //content pane
         cp.setLayout(new BorderLayout(10,0));
@@ -498,6 +528,11 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             sendWtcoButton.setEnabled(false);
             //sendField.setEditable(false);
             disconnectButton.setEnabled(false);
+            showButton.setEnabled(false);
+            confirmButton.setEnabled(false);
+            cpshowButton.setEnabled(false);
+            errorButton.setEnabled(false);
+            sendSPButton.setEnabled(false);
         } else {
             socket = s;
             changeBorder(" "+socket.getInetAddress().getHostName()+
@@ -506,6 +541,11 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             sendWtcoButton.setEnabled(true);
             //sendField.setEditable(true);
             disconnectButton.setEnabled(true);
+            showButton.setEnabled(true);
+            confirmButton.setEnabled(true);
+            cpshowButton.setEnabled(true);
+            errorButton.setEnabled(true);
+            sendSPButton.setEnabled(true);
         }
     }
     
@@ -561,8 +601,7 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
         else
             connectedBorder = BorderFactory.createTitledBorder(
                     new EtchedBorder(), "Connected Client : < "+ip+" >");
-        //CompoundBorder cb=new CompoundBorder(BorderFactory.createEmptyBorder(5,10,10,10),connectedBorder);
-        CompoundBorder cb=new CompoundBorder(connectedBorder, BorderFactory.createEmptyBorder(5,10,10,10));
+        CompoundBorder cb=new CompoundBorder(BorderFactory.createEmptyBorder(5,0,10,0),connectedBorder);
         centerPanel.setBorder(cb);
         invalidate();
         repaint();

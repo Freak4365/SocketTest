@@ -112,7 +112,7 @@ public class TelegrammHandler {
 								.hndshk(Tele_hndshk_Req)
 								.numb(count_out++)
 								.type(Tele_Stat)
-								.mfs_error("0000")
+								.mfs_error("")
 										.buildTelegram()
 											.toString();
 			send(stat);
@@ -143,6 +143,9 @@ public class TelegrammHandler {
     	server.setWtListData(list);
 	}
 	
+	/**
+	 * Convert list of communication points to String array and send it to GUI
+	 */
 	private void setCpListData(){
 		int length = cp_list.size();
 		String[] list = new String[length];
@@ -182,8 +185,23 @@ public class TelegrammHandler {
 		send(out);
 	}
 	
+	public void sendSPMsg(String hu, String hutype, String cp){
+		String sp = new TelegrammBuilder()
+							.sender(SocketTest.Name_PLC)
+							.reciever(SocketTest.Name_EWM)
+							.cp(cp)
+							.hndshk(Tele_hndshk_Req)
+							.numb(count_out++)
+							.type("SP")
+							.huid(hu)
+							.hutype(hutype)
+									.buildTelegram()
+										.toString();
+		send(sp);
+	}
+	
 	/**
-	 * Set an error code for a given cp 
+	 * Set an error code for a given CP
 	 * @param i index
 	 * @param error error code
 	 */
@@ -296,7 +314,13 @@ public class TelegrammHandler {
 	public String[] getCpInfo(int i){
 		communicationPoint cp = cp_list.get(i);
 		if(cp != null){
-			String[] s = {cp.getName(), cp.getError(), cp.getHu().getId()};
+			handlingUnit hu = cp.getHu();
+			String huid = "";
+			if(hu != null){
+				huid = hu.getId();
+			}
+			
+			String[] s = {cp.getName(), cp.getError(), huid};
 			return s;
 		}
 		else{

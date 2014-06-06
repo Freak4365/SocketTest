@@ -41,7 +41,7 @@ public class TelegrammBuilder {
 			Telegram_STAT t = new Telegram_STAT(send, empf, cp, hndshk, numb, error, type, source, dest, mfs_error, cs, csgr, rsrc);
 			return t;
 		}
-		else if(type.equals(SocketTest.Tele_Wt)||type.equals(SocketTest.Tele_Wtco)||type.equals("WTCC")){
+		else if(type.equals(SocketTest.Tele_Wt)||type.equals(SocketTest.Tele_Wtco)||type.equals("WTCC")||type.equals("SP")){
 			Telegram_WT t = new Telegram_WT(send, empf, cp, hndshk, numb, error, type, huid, hutype, source, dest, mfs_error);
 			return t;
 		}

@@ -156,17 +156,18 @@ public class SocketServer extends Thread {
 	    	{
 	    		data = data + buff[i];
 	    	}
-	    	//_in.skip(250-length);
     	}
     	else{
     		return null;
     	}
     	
+    	System.out.println("data: "+data);
+    	
     	if(read > tele_length){
     		data = data.substring(0, tele_length);
     	}
     	
-    	System.out.println("data: "+data);
+    	//System.out.println("data: "+data);
         System.out.println("Len got : "+read);
         return data;
     }

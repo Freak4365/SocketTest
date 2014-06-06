@@ -54,7 +54,7 @@ public class SocketTest extends JFrame {
         
         SocketTest st = new SocketTest();
         st.setTitle("PLC Emulator v 1.0.0");
-        st.setSize(800,500);
+        st.setSize(1000,700);
         Util.centerWindow(st);
         st.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
