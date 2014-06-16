@@ -533,7 +533,8 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
             cpshowButton.setEnabled(false);
             errorButton.setEnabled(false);
             sendSPButton.setEnabled(false);
-        } else {
+        } 
+        else {
             socket = s;
             changeBorder(" "+socket.getInetAddress().getHostName()+
                     " ["+socket.getInetAddress().getHostAddress()+"] ");

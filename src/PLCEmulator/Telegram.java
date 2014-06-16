@@ -29,6 +29,10 @@ public class Telegram {
 		setMfserror(_mfserror);
 	}
 	
+	/**
+	 * Construct Telegram from an Input String Telegram
+	 * @param in Telegram in String format
+	 */
 	public Telegram(String in){
 		//Telegram structure, change here and in subclasses.
 		_send = getFromTele(in, 0, 8);
@@ -81,7 +85,12 @@ public class Telegram {
 		return out;
 	}
 	
-	//fill string with dots to the given length
+	/**
+	 * fill up String with dots to the given length
+	 * @param in String to fill up
+	 * @param length length to which String should be filled up
+	 * @return String filled with dots
+	 */
 	protected String addDots(String in, int length){
 		String out = in;
 		while(out.length()<length){
@@ -104,7 +113,11 @@ public class Telegram {
 		return out;
 	}
 		
-	//Removes dots from String
+	/**
+	 * Removes dots from String
+	 * @param in String to remove dots from
+	 * @return Output String without dots
+	 */
 	protected String removeDots(String in){
 		String out = null;
 		String[] split = in.split("\\.");
@@ -117,7 +130,11 @@ public class Telegram {
 		return out;
 	}
 		
-	//converts integer in to String
+	/**
+	 * Converts int to String
+	 * @param in int
+	 * @return output String
+	 */
 	protected String intToString(int in){
 		String out = new Integer(in).toString();
 		while(out.length()<20){
@@ -141,6 +158,9 @@ public class Telegram {
 		_empf = temp;
 	}
 	
+	/**
+	 * Change Handshake 
+	 */
 	public void changeHndshk(){
 		if(_hndshk.equals(SocketTest.Tele_hndshk_Req)){
 			_hndshk = SocketTest.Tele_hndshk_Conf;
@@ -149,7 +169,6 @@ public class Telegram {
 			_hndshk = SocketTest.Tele_hndshk_Req;
 		}
 	}
-	//getters and setters
 	
 	public String getSend() {
 		return _send;

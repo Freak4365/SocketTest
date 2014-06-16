@@ -17,7 +17,6 @@ public class TelegrammBuilder {
 	private String cs;
 	private String csgr;
 	private String rsrc;
-	//WTCO: CONV1...EWM.......................A.00000000000000000004....WTCO00000000001000000136E1......CP02..............CP03..............
 	
 	public TelegrammBuilder(){
 		 send = "";
@@ -41,7 +40,7 @@ public class TelegrammBuilder {
 			Telegram_STAT t = new Telegram_STAT(send, empf, cp, hndshk, numb, error, type, source, dest, mfs_error, cs, csgr, rsrc);
 			return t;
 		}
-		else if(type.equals(SocketTest.Tele_Wt)||type.equals(SocketTest.Tele_Wtco)||type.equals("WTCC")||type.equals("SP")){
+		else if(type.equals(SocketTest.Tele_Wt)||type.equals(SocketTest.Tele_Wtco)||type.equals(SocketTest.Tele_Wtcc)||type.equals(SocketTest.Tele_Sp)){
 			Telegram_WT t = new Telegram_WT(send, empf, cp, hndshk, numb, error, type, huid, hutype, source, dest, mfs_error);
 			return t;
 		}

@@ -1,12 +1,14 @@
 package PLCEmulator;
 
 import java.awt.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import java.util.Properties;
 
 import javax.swing.*;
@@ -22,6 +24,8 @@ public class SocketTest extends JFrame {
 	public static String Tele_Stat;
 	public static String Tele_Wt;
 	public static String Tele_Wtco;
+	public static String Tele_Wtcc;
+	public static String Tele_Sp;
 	public static String Tele_hndshk_Req;
 	public static String Tele_hndshk_Conf;
 	public static String Tele_length;
@@ -72,7 +76,7 @@ public class SocketTest extends JFrame {
 		String fileName = System.getProperty("user.dir") + "/config/config.properties";
     	File file = new File(fileName);
     	
-    	//if ( !(file.exists())) {
+    	if ( !(file.exists())) {
     		//Create properties file
     		
     		File directory = new File(file.getParentFile().getAbsolutePath());
@@ -102,6 +106,8 @@ public class SocketTest extends JFrame {
 				prop.setProperty("Tele_Confirm_warehouse_task", "WTCO");
 				prop.setProperty("Name_EWM", "EWM");
 				prop.setProperty("Name_PLC", "CONV1");
+				prop.setProperty("Tele_Wtcc", "WTCC");
+				prop.setProperty("Tele_Sp", "SP");
 		 
 				// save properties to project root folder
 				prop.store(output, null);
@@ -118,7 +124,7 @@ public class SocketTest extends JFrame {
 				}
 		 
 			}//end of try
-    	//}//end of if
+    	}//end of if
 	 }//end of method
     
     /**

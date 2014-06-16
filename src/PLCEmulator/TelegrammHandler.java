@@ -50,9 +50,10 @@ public class TelegrammHandler {
 	}
 	
 	/**
-	 * Automatically react to incoming telegram 
-	 * @param inStr The String received from TCP-/IP-Connection
+	 * Automatically react to incoming telegram
+	 * @param inStr The String received from TCP/IP-Connection
 	 */
+	//TODO: Dispatch function
 	public void handle(String inStr){
 		//repeat last telegram if error occurs
 		if(inStr.equals(last_in)){
