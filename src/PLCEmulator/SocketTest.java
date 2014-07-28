@@ -76,7 +76,7 @@ public class SocketTest extends JFrame {
 		String fileName = System.getProperty("user.dir") + "/config/config.properties";
     	File file = new File(fileName);
     	
-    	if ( !(file.exists())) {
+    	//if ( !(file.exists())) {
     		//Create properties file
     		
     		File directory = new File(file.getParentFile().getAbsolutePath());
@@ -124,7 +124,7 @@ public class SocketTest extends JFrame {
 				}
 		 
 			}//end of try
-    	}//end of if
+    	//}//end of if
 	 }//end of method
     
     /**
@@ -150,6 +150,8 @@ public class SocketTest extends JFrame {
 			Tele_length = (prop.getProperty("Telegram_length"));
 			Tele_Wt = (prop.getProperty("Tele_Warehouse_task"));
 			Tele_Wtco = (prop.getProperty("Tele_Confirm_warehouse_task"));
+			Tele_Wtcc = (prop.getProperty("Tele_Wtcc"));
+			Tele_Sp = prop.getProperty("Tele_Sp");
 			Name_EWM = (prop.getProperty("Name_EWM"));
 			Name_PLC = (prop.getProperty("Name_PLC"));
 	 

@@ -499,6 +499,8 @@ public class SocketTestServer extends JPanel /*JFrame*/ {
     //disconnect a client
     public synchronized void disconnect() {
         try {
+        	setWtListData(new String[] {""});
+        	setCpListData(new String[] {""});
             socketServer.setDesonnected(true);
         } catch (Exception e) {}
     }
